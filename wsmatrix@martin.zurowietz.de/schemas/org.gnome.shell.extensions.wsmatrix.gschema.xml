@@ -34,6 +34,11 @@
             <default>true</default>
             <summary>Whether to show workspace thumbnails or not</summary>
         </key>
+        <key type="b" name="spread-windows">
+            <default>true</default>
+            <summary>Spread out windows in the switcher</summary>
+            <description>Workspaces with two or more windows show them side by side with their app icons, like the overview, instead of stacked as on screen.</description>
+        </key>
         <key type="b" name="enable-popup-workspace-hover">
             <default>false</default>
             <summary>Whether to allow hovering on workspaces in popup or not</summary>

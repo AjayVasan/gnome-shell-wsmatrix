@@ -7,6 +7,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import WorkspaceSwitcherPopupList from "./workspaceSwitcherPopupList.js";
 import WorkspaceThumbnail from "./workspaceThumbnail.js";
+import SpreadWorkspace, {overviewWindowCount} from "./spreadWorkspace.js";
 import {SwitcherPopup} from 'resource:///org/gnome/shell/ui/switcherPopup.js';
 
 let modals = [];
@@ -39,6 +40,8 @@ class WorkspaceSwitcherPopup extends SwitcherPopup {
         this._wm = wm;
         this._toggle = options.toggle || false;
         this._toggleAction = options.toggleAction;
+        // Spread cells only make sense once thumbnails are shown at all.
+        this._spreadWindows = options.spreadWindows && options.showThumbnails;
         this._items = this._createThumbnails();
         this._switcherList = new WorkspaceSwitcherPopupList(this._items, this._createLabels(), options);
         this._overviewKeybindingActions = options.overveiwKeybindingActions;
@@ -62,13 +65,23 @@ class WorkspaceSwitcherPopup extends SwitcherPopup {
         let thumbnails = [];
         let workspaceManager = global.workspace_manager;
 
-        for (let i = 0; i < workspaceManager.n_workspaces; i++) {
-            let workspace = workspaceManager.get_workspace_by_index(i);
-            let thumbnail = new WorkspaceThumbnail(workspace, this._monitorIndex)
-            thumbnails.push(thumbnail);
-        }
+        for (let i = 0; i < workspaceManager.n_workspaces; i++)
+            thumbnails.push(this._createThumbnail(workspaceManager.get_workspace_by_index(i)));
 
         return thumbnails;
+    }
+
+    // Windows that would hide each other are spread out; other workspaces keep the plain
+    // thumbnail, as does any cell where GNOME's overview workspace can't be built.
+    _createThumbnail(workspace) {
+        if (this._spreadWindows && overviewWindowCount(workspace, this._monitorIndex) > 1) {
+            try {
+                return new SpreadWorkspace(workspace, this._monitorIndex);
+            } catch (e) {
+                this._wm._logger.warn(`showing a thumbnail instead of spread windows: ${e}`);
+            }
+        }
+        return new WorkspaceThumbnail(workspace, this._monitorIndex);
     }
 
     _createLabels() {

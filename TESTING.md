@@ -13,6 +13,7 @@
 | `overview` | Drop targets and clicks on every row, strip height, which rows are shown and clipped, app grid |
 | `swipe` | Horizontal and vertical swipes, the Activities ring following a swipe, the popup after a swipe, restoring GNOME's gestures |
 | `features` | Ctrl+Alt+number and Ctrl+Alt+BackSpace through a virtual keyboard; the grid of dots in the Activities button: ring position, screen-reader text, fitting a 5×5 grid, dots scaling in and out |
+| `spread` | Opens real windows: a workspace with two windows gets a spread cell with icons and no titles, windows don't overlap, the cell's button keeps the pointer, one-window and empty cells are unchanged, the setting switches it off |
 | `multimonitor` | Run with `MONITORS=2`: one grab for all popups, closing one closes all, overview grid on the second monitor (#224, #253, #255) |
 
 Requirements:
@@ -56,7 +57,7 @@ Run these after logging back in on a new build.
 14. Clicking a lower-row thumbnail opens that workspace.
 15. Dragging a window onto a lower-row thumbnail moves it there.
 16. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Down</kbd> moves the view straight down, without drawing other rows over the thumbnails or the dash.
-17. After switching rows, window previews keep their size. The automated checks can't cover this because the test shell has no windows.
+17. After switching rows, window previews keep their size. The automated checks can't cover this because the overview scenario opens no windows.
 18. In the app grid, the workspace grid shrinks above the apps and the icons don't overlap.
 
 **Over a day of use**
@@ -71,6 +72,10 @@ Run these after logging back in on a new build.
 25. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> opens that cell; add <kbd>Shift</kbd> to move the focused window there.
 26. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>BackSpace</kbd> goes back to the previous workspace, and pressing it again returns.
 27. The Activities button shows a grid of small pills instead of GNOME's row of dots. A ring around the dot marks the active workspace and moves in step with the workspace slide on a switch and follows your fingers during a swipe (it jumps with Reduce Animation on), dots of workspaces with windows are brighter, a 5×5 grid still fits the bar, changing the grid size scales dots in and out, the dots switch to the overview's colour while it is open, resting the pointer on it for a moment shows the switcher popup until you move away, scrolling over it moves through the grid, and clicking still opens the overview. Turning "Show workspace grid in the top bar" off brings GNOME's row back.
+
+**Spread windows**
+
+28. With a dark editor maximised over a terminal on one workspace, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+arrow shows both side by side in that cell, each with its app icon and no title. A workspace with one window looks as before. Turning "Spread out windows in popup" off brings back the stacked thumbnail.
 
 **Second monitor**
 

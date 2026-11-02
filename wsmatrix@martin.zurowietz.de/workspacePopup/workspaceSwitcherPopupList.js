@@ -2,7 +2,6 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
-import {WorkspaceThumbnail} from 'resource:///org/gnome/shell/ui/workspaceThumbnail.js';
 
 const ITEM_SPACING = '12px';
 
@@ -153,7 +152,8 @@ export default GObject.registerClass({
 
             for (let i = 0; i < bbox.get_child().get_children().length; i++) {
                 let item = bbox.get_child().get_children()[i];
-                if (item instanceof WorkspaceThumbnail) {
+                // Thumbnails and spread cells.
+                if (typeof item.setScale === 'function') {
                     // 2 is magic number. Can not find the reason for it.
                     item.setScale((bbox.get_width() - leftPadding - rightPadding - 2) / item.get_width(), (bbox.get_height() - topPadding - bottomPadding - 2) / item.get_height());
                 }

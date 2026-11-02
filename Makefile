@@ -18,7 +18,7 @@ test: default
 
 # Run every automated scenario in tests/nested.
 check:
-	@set -e; for s in popup scroll grab cycle overview swipe features; do echo "== $$s"; tests/nested/run.sh $$s; done
+	@set -e; for s in popup scroll grab spread cycle overview swipe features; do echo "== $$s"; tests/nested/run.sh $$s; done
 	@echo "== multimonitor"; MONITORS=2 tests/nested/run.sh multimonitor
 
 # Render the Activities grid in a few states and open the picture.

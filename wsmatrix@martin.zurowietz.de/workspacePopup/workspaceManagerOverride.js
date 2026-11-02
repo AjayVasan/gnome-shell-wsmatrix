@@ -184,6 +184,7 @@ export default class WorkspaceManagerOverride {
             'changed::popup-timeout', destroyPopup,
             'changed::scale', destroyPopup,
             'changed::show-thumbnails', destroyPopup,
+            'changed::spread-windows', destroyPopup,
             'changed::show-workspace-names', destroyPopup,
             'changed::enable-popup-workspace-hover', destroyPopup,
             this);
@@ -631,6 +632,7 @@ export default class WorkspaceManagerOverride {
         options = options || {};
         options.scale = this.settings.get_double('scale');
         options.showThumbnails = this.settings.get_boolean('show-thumbnails');
+        options.spreadWindows = this.settings.get_boolean('spread-windows');
         options.showWorkspaceNames = this.settings.get_boolean('show-workspace-names');
         options.popupTimeout = this.settings.get_int('popup-timeout')
         options.enablePopupWorkspaceHover = this.settings.get_boolean('enable-popup-workspace-hover');

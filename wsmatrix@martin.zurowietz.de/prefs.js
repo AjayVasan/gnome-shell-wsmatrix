@@ -53,6 +53,8 @@ export default class Prefs extends ExtensionPreferences {
 
         group.add(this._createSwitcherRow('Show workspace thumbnails in popup', 'show-thumbnails', settings));
 
+        group.add(this._createSwitcherRow('Spread out windows in popup', 'spread-windows', settings));
+
         group.add(this._createSwitcherRow('Show workspace names in popup', 'show-workspace-names', settings));
 
         group.add(this._createSwitcherRow('Select workspaces with mouse hover in popup', 'enable-popup-workspace-hover', settings));
