@@ -3,10 +3,11 @@ import Graphene from 'gi://Graphene';
 import {Workspace} from 'resource:///org/gnome/shell/ui/workspace.js';
 import {ControlsState, OverviewAdjustment} from 'resource:///org/gnome/shell/ui/overviewControls.js';
 
-// Windows the overview would show for this workspace on this monitor.
-export function overviewWindowCount(workspace, monitorIndex) {
+// Windows the overview would show for this workspace on this monitor, leaving out `leaving`,
+// a window that is on its way out but still listed.
+export function overviewWindowCount(workspace, monitorIndex, leaving = null) {
     return workspace.list_windows()
-        .filter(w => !w.skip_taskbar && w.get_monitor() === monitorIndex).length;
+        .filter(w => w !== leaving && !w.skip_taskbar && w.get_monitor() === monitorIndex).length;
 }
 
 // A popup cell that lays its windows out side by side like the overview's window picker,

@@ -6,8 +6,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import WorkspaceSwitcherPopupList from "./workspaceSwitcherPopupList.js";
-import WorkspaceThumbnail from "./workspaceThumbnail.js";
-import SpreadWorkspace, {overviewWindowCount} from "./spreadWorkspace.js";
+import WorkspaceCell from "./workspaceCell.js";
 import {SwitcherPopup} from 'resource:///org/gnome/shell/ui/switcherPopup.js';
 
 let modals = [];
@@ -65,23 +64,12 @@ class WorkspaceSwitcherPopup extends SwitcherPopup {
         let thumbnails = [];
         let workspaceManager = global.workspace_manager;
 
-        for (let i = 0; i < workspaceManager.n_workspaces; i++)
-            thumbnails.push(this._createThumbnail(workspaceManager.get_workspace_by_index(i)));
+        for (let i = 0; i < workspaceManager.n_workspaces; i++) {
+            thumbnails.push(new WorkspaceCell(workspaceManager.get_workspace_by_index(i),
+                this._monitorIndex, this._spreadWindows, this._wm._logger));
+        }
 
         return thumbnails;
-    }
-
-    // Windows that would hide each other are spread out; other workspaces keep the plain
-    // thumbnail, as does any cell where GNOME's overview workspace can't be built.
-    _createThumbnail(workspace) {
-        if (this._spreadWindows && overviewWindowCount(workspace, this._monitorIndex) > 1) {
-            try {
-                return new SpreadWorkspace(workspace, this._monitorIndex);
-            } catch (e) {
-                this._wm._logger.warn(`showing a thumbnail instead of spread windows: ${e}`);
-            }
-        }
-        return new WorkspaceThumbnail(workspace, this._monitorIndex);
     }
 
     _createLabels() {

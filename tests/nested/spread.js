@@ -17,7 +17,14 @@ function scenario(ext, T) {
     const openPopup = () => ext.overrideWorkspace._showWorkspaceSwitcherPopup(true);
     const closePopup = () => ext.overrideWorkspace._destroyWorkspaceSwitcherPopup();
     const cells = () => T.popup()._items;
-    const kind = i => cells()[i].constructor.name;
+    // What a cell is showing: a spread workspace or a plain thumbnail.
+    const content = i => cells()[i].view ?? cells()[i];
+    const kind = i => content(i).constructor.name;
+    // Moves a window with the extension's own Ctrl+Alt+Shift+arrow path.
+    const move = (title, dir) => ext.overrideWorkspace._showWorkspaceSwitcher(
+        global.display, window(title), null, `move-to-workspace-${dir}`);
+    // How much of its button a cell's content covers, side to side.
+    const fill = i => content(i).get_transformed_size()[0] / buttons()[i].get_transformed_size()[0];
     const buttons = () => T.popup()._switcherList._items;
     const overlap = (a, b) => a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;
     let delegates;
@@ -35,7 +42,7 @@ function scenario(ext, T) {
             openPopup();
         }],
         [4850, () => T.expect('spread windows appear without growing in',
-            cells()[0]._windows.map(p => [p.scale_x, p.scale_y]), [[1, 1], [1, 1]])],
+            content(0)._windows.map(p => [p.scale_x, p.scale_y]), [[1, 1], [1, 1]])],
         [5300, () => {
             T.expect('a workspace with two windows gets a spread cell', kind(0), 'SpreadWorkspace');
             T.expect('a workspace with one window keeps its thumbnail', kind(1), 'WorkspaceThumbnail');
@@ -43,7 +50,7 @@ function scenario(ext, T) {
             T.shot('spread-popup');
         }],
         [5350, () => {
-            const previews = cells()[0]._windows;
+            const previews = content(0)._windows;
             T.expect('both windows are in the spread cell', previews.length, 2);
             const [a, b] = previews.map(p => p.get_allocation_box());
             T.expect('spread windows do not overlap', overlap(a, b), false);
@@ -53,12 +60,12 @@ function scenario(ext, T) {
         }],
         [5400, () => {
             // Clicks and hover belong to the cell's button, not to the windows inside it.
-            const preview = cells()[0]._windows[0];
+            const preview = content(0)._windows[0];
             const [x, y] = preview.get_transformed_position();
             const [w, h] = preview.get_transformed_size();
             const hit = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x + w / 2, y + h / 2);
             T.expect('the cell button takes the pointer', buttons()[0].contains(hit), true);
-            T.expect('nothing inside the spread cell takes the pointer', cells()[0].contains(hit), false);
+            T.expect('nothing inside the spread cell takes the pointer', content(0).contains(hit), false);
         }],
         [5450, () => closePopup()],
         [5700, () => T.expect('windows get their drag-and-drop delegate back',
@@ -74,6 +81,27 @@ function scenario(ext, T) {
             T.expect('with the setting off the cell is a thumbnail', kind(0), 'WorkspaceThumbnail');
             closePopup();
             settings.set_boolean('spread-windows', true);
+        }],
+        // Moving windows while the popup is up changes which cells need spreading.
+        [6600, () => {
+            T.goTo(0);
+            openPopup();
+        }],
+        [7000, () => T.expect('before the move: spread cell, then thumbnail', [kind(0), kind(1)],
+            ['SpreadWorkspace', 'WorkspaceThumbnail'])],
+        [7050, () => move('A', 'right')],
+        [7600, () => {
+            T.expect('a window moved onto a one-window workspace spreads that cell', kind(1), 'SpreadWorkspace');
+            T.expect('the moved window is in the spread cell', content(1)._windows?.length, 2);
+            T.expect('the workspace left with one window gets its thumbnail back', kind(0), 'WorkspaceThumbnail');
+            T.expect('the new spread cell is scaled to fit its button', fill(1) > 0.8 && fill(1) <= 1, true);
+            T.shot('spread-after-move');
+        }],
+        [7700, () => move('A', 'left')],
+        [8200, () => {
+            T.expect('moving the window back swaps both cells back', [kind(0), kind(1)],
+                ['SpreadWorkspace', 'WorkspaceThumbnail']);
+            closePopup();
         }],
         [9000, () => procs.forEach(p => p.force_exit())],
     ];
