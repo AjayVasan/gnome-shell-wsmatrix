@@ -182,8 +182,11 @@ export default class WorkspacesView extends Override {
             function (rowSpacing, colSpacing, containerBox) {
                 const workspace = this._container.get_parent();
                 const view = workspace?.get_parent();
-                const active = view instanceof GWorkspacesView &&
-                    view._workspaces[global.workspace_manager.get_active_workspace_index()];
+                // Non-overview workspaces (e.g. the switcher popup's spread cells) share this
+                // layout manager too; only the overview's own view has rows to offset against.
+                const active = view instanceof GWorkspacesView
+                    ? view._workspaces[global.workspace_manager.get_active_workspace_index()]
+                    : undefined;
                 const offset = containerBox && active?.has_allocation() && workspace.has_allocation()
                     ? workspace.allocation.y1 - active.allocation.y1 : 0;
                 if (!offset)
