@@ -35,7 +35,7 @@ Run these after logging back in on a new build.
 **Popup** (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+arrows)
 
 1. The popup fades in with a slight zoom, on a frosted, blurred background.
-2. The highlight ring slides to the new cell, and the other cells are slightly dimmed.
+2. The highlight ring slides to the new cell, and the windows in every cell stay opaque.
 3. Empty workspaces show a small dot.
 4. With workspace names on, the selected label uses your accent colour.
 5. Holding <kbd>Ctrl</kbd>+<kbd>Alt</kbd> and tapping arrows quickly keeps the popup up and following.
