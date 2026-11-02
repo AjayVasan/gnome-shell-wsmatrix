@@ -7,7 +7,8 @@ import {ControlsState, OverviewAdjustment} from 'resource:///org/gnome/shell/ui/
 // a window that is on its way out but still listed.
 export function overviewWindowCount(workspace, monitorIndex, leaving = null) {
     return workspace.list_windows()
-        .filter(w => w !== leaving && !w.skip_taskbar && w.get_monitor() === monitorIndex).length;
+        .filter(w => w !== leaving && !w.skip_taskbar && !w.is_on_all_workspaces() &&
+            w.get_monitor() === monitorIndex).length;
 }
 
 // A popup cell that lays its windows out side by side like the overview's window picker,
@@ -45,9 +46,13 @@ class SpreadWorkspace extends Workspace {
 
     // The preview claims the window's _delegate, which the overview's drag and drop reads,
     // and clears it when destroyed. Give back what was there before.
+    // A window on all workspaces is in every spread cell, so look past another cell's preview.
     _addWindowClone(metaWindow) {
-        const delegate = metaWindow._delegate;
+        const previous = metaWindow._delegate;
+        const delegate = previous?._workspace instanceof SpreadWorkspace
+            ? previous._popupDelegate : previous;
         const clone = super._addWindowClone(metaWindow);
+        clone._popupDelegate = delegate;
         clone.connect('destroy', () => (metaWindow._delegate = delegate));
         return clone;
     }

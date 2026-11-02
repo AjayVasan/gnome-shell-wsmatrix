@@ -103,6 +103,32 @@ function scenario(ext, T) {
                 ['SpreadWorkspace', 'WorkspaceThumbnail']);
             closePopup();
         }],
-        [9000, () => procs.forEach(p => p.force_exit())],
+        // A window on all workspaces is shown in every spread cell but doesn't count towards one.
+        [8300, () => ['S', 'D'].forEach(open)],
+        [10300, () => {
+            window('D')?.change_workspace_by_index(1, false);
+            window('S')?.stick();
+        }],
+        [10500, () => {
+            delegates = [window('S')?._delegate];
+            openPopup();
+        }],
+        [11000, () => {
+            T.expect('two spread cells share the window on all workspaces', [kind(0), kind(1),
+                content(0)._windows.length, content(1)._windows.length],
+            ['SpreadWorkspace', 'SpreadWorkspace', 3, 3]);
+            closePopup();
+        }],
+        [11300, () => T.expect('the window on all workspaces gets its delegate back',
+            window('S')?._delegate === delegates[0], true)],
+        [11400, () => {
+            window('D')?.change_workspace_by_index(0, false);
+            openPopup();
+        }],
+        [11900, () => {
+            T.expect('a window on all workspaces does not make a cell spread', kind(1), 'WorkspaceThumbnail');
+            closePopup();
+        }],
+        [12500, () => procs.forEach(p => p.force_exit())],
     ];
 }
