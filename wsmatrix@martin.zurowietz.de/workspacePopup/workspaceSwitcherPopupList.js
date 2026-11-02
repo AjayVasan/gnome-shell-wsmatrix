@@ -5,8 +5,6 @@ import St from 'gi://St';
 import {WorkspaceThumbnail} from 'resource:///org/gnome/shell/ui/workspaceThumbnail.js';
 
 const ITEM_SPACING = '12px';
-const DIM_OPACITY = 217; // ~85%, keeps the target cell the visual anchor
-const HIGHLIGHT_TIME = 150;
 
 const SwitcherButton = GObject.registerClass(
 class SwitcherButton extends St.Button {
@@ -197,19 +195,15 @@ export default GObject.registerClass({
 
         const changed = this._highlighted !== index;
         this._highlighted = index;
-        this._updateCells(changed);
+        this._updateEmptyDots();
         if (changed)
             this.emit('highlight-changed', index);
     }
 
-    _updateCells(animate) {
+    // Cells stay fully opaque: dimming them faded each window separately, so the wallpaper
+    // showed through the windows.
+    _updateEmptyDots() {
         this._items.forEach((item, i) => {
-            const opacity = i === this._highlighted ? 255 : DIM_OPACITY;
-            if (animate)
-                item.ease({opacity, duration: HIGHLIGHT_TIME, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
-            else
-                item.opacity = opacity;
-
             const ws = this._workspaces[i];
             item._emptyDot.visible = !!ws && !ws.list_windows().some(w => !w.is_on_all_workspaces());
         });

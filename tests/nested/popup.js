@@ -6,6 +6,8 @@ function scenario(ext, T) {
         [3000, () => T.switch('right')],
         [3060, () => T.shot('popup-entrance')],
         [3300, () => T.shot('popup-settled')],
+        [3320, () => T.expect('other cells are not dimmed, so windows stay opaque',
+            T.popup()._switcherList._items.map(item => item.opacity).every(o => o === 255), true)],
         [3350, () => T.expect('right moves one column', T.active(), 1)],
         [3400, () => T.switch('down')],
         [3700, () => T.expect('down moves one row', T.active(), 1 + c)],
